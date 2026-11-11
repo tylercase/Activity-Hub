@@ -1,0 +1,21 @@
+# Virtual environment
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Notebook checkpoints
+.ipynb_checkpoints/
+
+# Personal run data (GPS coordinates)
+*.gpx
+*.parquet
+*.csv
+
+# Credentials, if you ever use the Drive API
+credentials.json
+token.json
+
+# VS Code workspace settings (optional)
+.vscode/
