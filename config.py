@@ -10,6 +10,19 @@ GPX_DF_COLS = (
     "hr"
 )
 
+SUMMARY_COLS = (
+    "run_id",
+    "duration",
+    "distance",
+    "max_hr",
+    "avg_hr",
+    "elevation_gain",
+    "elevation_loss",
+    "avg_speed",
+    "avg_cadence",
+    "primary_zone"
+)
+
 MAX_HR = 205
 
 HIKE_DIR = Path(r"user_data\hike_data")

@@ -9,6 +9,7 @@ __pycache__/
 .ipynb_checkpoints/
 
 # Personal run data (GPS coordinates)
+user_data/
 *.gpx
 *.parquet
 *.csv

@@ -7,6 +7,7 @@ from DataImportWindows import *
 from config import *
 from GetSummary import *
 from CTkListbox import CTkListbox
+from CreateSummaryCSV import create_summaries
 import pandas as pd
 import numpy as np
 
@@ -16,6 +17,7 @@ import numpy as np
 #########################################################################################################
 
 def main():
+    create_summaries()
     app = App()
     app.mainloop()
 

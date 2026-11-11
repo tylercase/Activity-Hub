@@ -30,7 +30,6 @@ class ImportZeppWindow(customtkinter.CTkToplevel):
                                                 font=("Helvetica", 16, "bold"),
                                                 text_color="black",
                                                 fg_color="darkgreen",
-                                                bg_color="white",
                                                 height=30,
                                                 width=90,
                                                 corner_radius=10,
@@ -40,7 +39,6 @@ class ImportZeppWindow(customtkinter.CTkToplevel):
                                                 font=("Helvetica", 16, "bold"),
                                                 text_color="black",
                                                 fg_color="darkblue",
-                                                bg_color="white",
                                                 height=30,
                                                 width=90,
                                                 corner_radius=10,
@@ -50,7 +48,6 @@ class ImportZeppWindow(customtkinter.CTkToplevel):
                                                 font=("Helvetica", 16, "bold"),
                                                 text_color="black",
                                                 fg_color="grey",
-                                                bg_color="white",
                                                 height=30,
                                                 width=90,
                                                 corner_radius=10,
@@ -131,7 +128,7 @@ class WorkoutExportWindow(customtkinter.CTkToplevel):
             frame = customtkinter.CTkFrame(self)
             frame.pack(pady=5)
 
-            label = customtkinter.CTkLabel(frame, text="key")
+            label = customtkinter.CTkLabel(frame, text=f"{key}")
             label.pack(padx=30, side="left")
 
             entry = customtkinter.CTkEntry(frame)
