@@ -7,6 +7,7 @@ from config import *
 from typing import Callable
 import pandas as pd
 import numpy as np
+from SetRoute import set_route
 
 class ImportZeppWindow(customtkinter.CTkToplevel):
     ## Window that lets user pick the type of workout that they want to import, 
@@ -118,9 +119,7 @@ class WorkoutExportWindow(customtkinter.CTkToplevel):
 
         self.mapview = tkintermapview.TkinterMapView(self)
         self.mapview.pack(fill="both", expand=True, padx=20, pady=20)
-        self.route_path = None
-
-        self.set_route(self.df)
+        set_route(self.mapview, self.df)
 
         self.entry_boxes:list[customtkinter.CTkEntry] = []
 
@@ -153,20 +152,17 @@ class WorkoutExportWindow(customtkinter.CTkToplevel):
                                                 command=self.cancel_save)
         cancel_button.pack(padx=5, side="left")
 
-    def set_route(self, df:pd.DataFrame):
-        coords = df[["latitude", "longitude"]].to_numpy().tolist()
-        route = [tuple(c) for c in coords]
+    # def set_route(self, map_widget:tkintermapview.TkinterMapView, df:pd.DataFrame):
+    #     coords = df[["latitude", "longitude"]].to_numpy().tolist()
+    #     route = [tuple(c) for c in coords]
 
-        if len(route) < 2:
-            return
+    #     if len(route) < 2:
+    #         return
 
-        if self.route_path is not None:
-            self.route_path.delete()
-
-        self.route_path = self.mapview.set_path(route, color="red", width=2)
-        lats = [p[0] for p in route]
-        lons = [p[1] for p in route]
-        self.mapview.fit_bounding_box((max(lats), min(lons)), (min(lats), max(lons)))
+    #     map_widget.set_path(route, color="red", width=2)
+    #     lats = [p[0] for p in route]
+    #     lons = [p[1] for p in route]
+    #     map_widget.fit_bounding_box((max(lats), min(lons)), (min(lats), max(lons)))
 
     def save_data(self, workout_type:str):
         match workout_type:

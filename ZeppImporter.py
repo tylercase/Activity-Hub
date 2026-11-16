@@ -32,7 +32,7 @@ def get_summary(df:pd.DataFrame) -> dict:
     elevation_gain = round(sum([i for i in df["d_elevation"] if i > 0]), 2)
     elevation_loss = round(sum([i for i in df["d_elevation"] if i < 0]), 2)
     avg_speed = round(float(df["speed"].mean()), 2)
-    avg_cadence = round(float(df["cadence"].mean()), 2)
+    avg_cadence = int(df["cadence"].mean())
     zone = int(df["zone"].mode().iloc[0])
 
     workout_dict = {

@@ -23,6 +23,27 @@ SUMMARY_COLS = (
     "primary_zone"
 )
 
+PLOTTING_COLOR_DICT = {
+    "hr": "red",
+    "speed": "blue",
+    "elevation": "green",
+    "cadence": "purple",
+    "zone": "black"
+}
+
+SUMMARY_UNITS = [
+    "",
+    "",
+    "miles",
+    "bpm",
+    "bpm",
+    "ft",
+    "ft",
+    "mph",
+    "",
+    ""
+]
+
 MAX_HR = 205
 
 HIKE_DIR = Path(r"user_data\hike_data")

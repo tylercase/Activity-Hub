@@ -26,6 +26,6 @@ def create_summaries():
             print(f"summary.csv already exists at {summary}, skipping.")
             continue
         empty_df = pd.DataFrame(columns=SUMMARY_COLS)
-        empty_df.to_csv(summary)
+        empty_df.to_csv(summary, index=False)
 
     print("Folders created")

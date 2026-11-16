@@ -5,11 +5,13 @@ from tkinter import ttk, filedialog
 from ZeppImporter import import_workout
 from DataImportWindows import *
 from config import *
-from GetSummary import *
+from GetData import *
 from CTkListbox import CTkListbox
 from CreateSummaryCSV import create_summaries
+from ViewWorkout import ViewWorkout
 import pandas as pd
 import numpy as np
+
 
 
 #########################################################################################################
@@ -49,9 +51,11 @@ class App(customtkinter.CTk):
 
         self.import_zepp_data_btn.pack(side="top", pady=20, padx=10)
 
-        self.edit_workout_btn = customtkinter.CTkButton(self.button_frame,
-                                                        text="Edit Workout",
-                                                        command=self.edit_workout,
+
+        self.view_workout_window = None
+        self.view_workout_btn = customtkinter.CTkButton(self.button_frame,
+                                                        text="View Workout",
+                                                        command=self.view_workout,
                                                         width=120,
                                                         height=40,
                                                         corner_radius=20,
@@ -60,15 +64,22 @@ class App(customtkinter.CTk):
                                                         font=("Helvetica", 14, "bold"),
                                                         text_color="black",
                                                         hover_color="grey")
-        self.edit_workout_btn.pack(side="top", pady=20, padx=10)
+        self.view_workout_btn.pack(side="top", pady=20, padx=10)
 
 
         self.recent_workouts_view = WorkoutViewFrame(self)
         self.recent_workouts_view.pack(pady=10, padx=20, side="left")
 
-    def edit_workout(self):
-        workout_to_edit = self.recent_workouts_view.get_selection()
-        print(workout_to_edit)
+    def view_workout(self):
+        workout_to_view = self.recent_workouts_view.get_selection()
+        print(workout_to_view)
+        if self.view_workout_window is None or not self.view_workout_window.winfo_exists():
+            self.view_workout_window = ViewWorkout(self, workout_to_view)
+            self.view_workout_window.after(10, self.view_workout_window.lift)
+        else:
+            self.view_workout_window.destroy()
+            self.view_workout_window = ViewWorkout(self, workout_to_view)
+            self.view_workout_window.after(10, self.view_workout_window.lift)
         return
 
     def open_import_window(self):
@@ -170,11 +181,11 @@ class WorkoutViewFrame(customtkinter.CTkFrame):
         idx = 0
         for i in self.listboxes:
             if idx == 0:
-                self.fill_listbox(i, get_hikes_ids())
+                self.fill_listbox(i, get_ids("hike"))
             elif idx == 1:
-                self.fill_listbox(i, get_runs_ids())
+                self.fill_listbox(i, get_ids("run"))
             elif idx == 2:
-                self.fill_listbox(i, get_walks_ids())
+                self.fill_listbox(i, get_ids("walk"))
             
             idx += 1
             
