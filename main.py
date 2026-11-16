@@ -73,8 +73,9 @@ class App(customtkinter.CTk):
     def view_workout(self):
         workout_to_view = self.recent_workouts_view.get_selection()
         print(workout_to_view)
+        data = get_workout_data_package(workout_to_view[0], workout_to_view[1])
         if self.view_workout_window is None or not self.view_workout_window.winfo_exists():
-            self.view_workout_window = ViewWorkout(self, workout_to_view)
+            self.view_workout_window = ViewWorkout(self, workout_to_view, data)
             self.view_workout_window.after(10, self.view_workout_window.lift)
         else:
             self.view_workout_window.destroy()

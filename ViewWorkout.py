@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import tkintermapview
 import tkinter as tk
+from typing import Callable
 from config import *
 from GetData import *
 from PlottingView import NewGraph
@@ -10,16 +11,16 @@ from UnitConversions import *
 from SetRoute import set_route
 
 class ViewWorkout(customtkinter.CTkToplevel):
-    def __init__(self, parent, workout:tuple, *args, **kwargs):
+    def __init__(self, parent, workout:tuple, data:tuple, import_window=False, *args, on_save: Callable[[], None] | None = None, **kwargs):
         super().__init__(parent, *args, **kwargs)
-        self.title("View Workout")
         workout_type, self.run_id = workout
+        self.title(f"Import new {workout_type}") if import_window else self.title("View Workout")
 
-        self.data = get_workout_data_package(workout_type, self.run_id)     # (df, summary)
+        self.data = data     # (df, summary)
         print(self.data[0])
         print(self.data[1])
 
-        info_panel = BasicWorkoutInfoPanel(self, self.data, workout)
+        info_panel = BasicWorkoutInfoPanel(self, self.data, workout, import_window, on_save=on_save)
         info_panel.pack(padx=10,
                         pady=10)
         
@@ -46,11 +47,13 @@ class ViewWorkout(customtkinter.CTkToplevel):
 
 
 class BasicWorkoutInfoPanel(customtkinter.CTkFrame):
-    def __init__(self, parent, data:tuple, workout_info:tuple, *args, **kwargs):
+    def __init__(self, parent, data:tuple, workout_info:tuple, import_window=False, *args, on_save: Callable[[], None] | None = None, **kwargs):
         super().__init__(parent, *args, **kwargs)
         self.df, self.summary = data
+        self.on_save = on_save
         self.workout_type, self.run_id = workout_info
-        self.df = convert_df(self.df)
+        if import_window:
+            self.df = convert_df(self.df)
 
         label = customtkinter.CTkLabel(self,
                                 text=f"{self.workout_type} workout\nid = {self.run_id}",
@@ -74,7 +77,13 @@ class BasicWorkoutInfoPanel(customtkinter.CTkFrame):
         summary_frame.pack(pady=10,
                            padx=10,
                            side="left",
-                           anchor="nw")
+                           anchor="nw",
+                           fill="y")
+        summary_value_frame = customtkinter.CTkFrame(summary_frame)
+        summary_value_frame.pack(pady=10,
+                                 padx=10,
+                                 side="top",
+                                 fill="y")
 
         summary_values = self.summary.iloc[0].tolist()
         summary_values[1] = s_to_time(summary_values[1])
@@ -86,9 +95,11 @@ class BasicWorkoutInfoPanel(customtkinter.CTkFrame):
 
         value_boxes = []
         for i in range(1, len(summary_values)):     # skip first item because it is only "run_id"
-            value_frame = customtkinter.CTkFrame(summary_frame)
+            value_frame = customtkinter.CTkFrame(summary_value_frame)
             value_frame.pack(pady=5,
-                             padx=5)
+                             padx=5,
+                             expand=True,
+                             fill="y")
 
             key_label = customtkinter.CTkLabel(value_frame, 
                                                text=f"{SUMMARY_COLS[i]}",
@@ -105,19 +116,34 @@ class BasicWorkoutInfoPanel(customtkinter.CTkFrame):
                            pady=5)
             value_boxes.append(value_box)
 
+        ## If this is an import window, add buttons.
+        if import_window:
+            btn_frame = customtkinter.CTkFrame(summary_frame)
+            btn_frame.pack(pady=10)
+
+            ok_button = customtkinter.CTkButton(btn_frame,
+                                                text="Import",
+                                                command=lambda wo_type = self.workout_type: self.save_data(wo_type))
+            ok_button.pack(padx=5, side="left")
+
+            cancel_button = customtkinter.CTkButton(btn_frame,
+                                                    text="Cancel",
+                                                    command=self.cancel_save)
+            cancel_button.pack(padx=5, side="left")
+
         ## Graph Tap View
         tabview = customtkinter.CTkTabview(self)
         tabview.pack(side="left",
                      anchor="nw",
                      padx=20,
-                     pady=10)
+                     pady=0)
 
         tabview.add("hr")
-        hr_plot = NewGraph(tabview.tab("hr"), self.df, y_column="hr")
+        hr_plot = NewGraph(tabview.tab("hr"), self.df, y_column="hr", avg=True)
         hr_plot.pack(padx=10, pady=10)
 
         tabview.add("speed")
-        speed_plot = NewGraph(tabview.tab("speed"), self.df, y_column="speed")
+        speed_plot = NewGraph(tabview.tab("speed"), self.df, y_column="speed", avg=True)
         speed_plot.pack(padx=10, pady=10)
 
         tabview.add("elevation")
@@ -125,12 +151,47 @@ class BasicWorkoutInfoPanel(customtkinter.CTkFrame):
         elevation_plot.pack(padx=10, pady=10)
 
         tabview.add("cadence")
-        cadence_plot = NewGraph(tabview.tab("cadence"), self.df, y_column="cadence")
+        cadence_plot = NewGraph(tabview.tab("cadence"), self.df, y_column="cadence", scatter=True, avg=True)
         cadence_plot.pack(padx=10, pady=10)
 
         tabview.add("zone")
         zone_plot = NewGraph(tabview.tab("zone"), self.df, y_column="zone")
         zone_plot.pack(padx=10, pady=10)
+
+    def save_data(self, workout_type:str):
+        match workout_type:
+            case "hike":
+                folder_dir = HIKE_DIR
+            case "run":
+                folder_dir = RUN_DIR
+            case "walk":
+                folder_dir = WALK_DIR
+
+        # summary = pd.read_csv(folder_dir / "summary.csv")
+        new_row_summary = self.summary
+        run_id = new_row_summary["run_id"].iloc[0]
+
+        # If summary file does not exist, then the new row is the summary, skip read and concat
+        if not Path(folder_dir / "summary.csv").exists():
+            summary_df = new_row_summary
+        else:
+            old_df = pd.read_csv(folder_dir / "summary.csv")
+            summary_df = pd.concat([old_df, new_row_summary], ignore_index=True).drop_duplicates("run_id", keep="last")
+
+        summary_df = summary_df.sort_values(by="run_id", ascending=False)
+        summary_df.to_csv(folder_dir / "summary.csv", index=False)
+
+        df:pd.DataFrame = self.df
+        df.to_parquet(folder_dir / f"{run_id}.parquet")
+        print(f"New {workout_type} workout imported.")
+        if self.on_save() is not None:
+            self.on_save()
+
+        self.master.destroy()
+
+    def cancel_save(self):
+        print("No data was saved.")
+        self.master.destroy()
         
         
 

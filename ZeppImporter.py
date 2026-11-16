@@ -13,41 +13,32 @@ def import_workout(path:str, workout_type:str):
         return
 
     df = extract_basic_data(file_path)
-    workout_dict = get_summary(df)
-    print(workout_dict)
+    summary = get_summary(df)
+    print(summary)
 
     # print(f"New {workout_type} imported")
-    return (
-        df,
-        workout_dict,
-        workout_type
-    )
+    return (df, summary)
 
-def get_summary(df:pd.DataFrame) -> dict:
-    run_id = "-".join(str(df["time"].iloc[0]).split("-")[:-1]).replace(":","_")
-    duration = (df["time"].iloc[-1] - df["time"].iloc[0]).total_seconds()
-    distance = round(float(df["distance"].iloc[-1]), 2)
-    max_hr = int(df["hr"].max())
-    avg_hr = int(df["hr"].mean())
-    elevation_gain = round(sum([i for i in df["d_elevation"] if i > 0]), 2)
-    elevation_loss = round(sum([i for i in df["d_elevation"] if i < 0]), 2)
-    avg_speed = round(float(df["speed"].mean()), 2)
-    avg_cadence = int(df["cadence"].mean())
-    zone = int(df["zone"].mode().iloc[0])
+def get_info(workout_type, workout_data):
+    return (workout_type, workout_data[1]["run_id"].iloc[0])
 
-    workout_dict = {
-        "run_id": run_id,
-        "duration": duration,
-        "distance": distance,
-        "max_hr": max_hr,
-        "avg_hr": avg_hr,
-        "elevation_gain": elevation_gain,
-        "elevation_loss": elevation_loss,
-        "avg_speed": avg_speed,
-        "avg_cadence": avg_cadence,
-        "primary_zone": zone
-    }
-    return workout_dict
+def get_summary(df:pd.DataFrame) -> pd.DataFrame:
+    lst = [
+        "-".join(str(df["time"].iloc[0]).split("-")[:-1]).replace(":","_"),     # run_id
+        (df["time"].iloc[-1] - df["time"].iloc[0]).total_seconds(),             # duration
+        round(float(df["distance"].iloc[-1]), 2),                               # distance
+        int(df["hr"].max()),                                                    # max_hr
+        int(df["hr"].mean()),                                                   # avg_hr
+        round(sum([i for i in df["d_elevation"] if i > 0]), 2),                 # elevation_gain
+        round(sum([i for i in df["d_elevation"] if i < 0]), 2),                 # elevation_loss
+        round(float(df["speed"].mean()), 2),                                    # avg_speed
+        int(df["cadence"].mean()),                                              # avg_cadence
+        int(df["zone"].mode().iloc[0])                                          # zone
+    ]
+
+
+    df = pd.DataFrame([lst], columns=SUMMARY_COLS)
+    return df
 
 def extract_basic_data(path:Path) -> pd.DataFrame:
     # All workout types have these same points of data,
