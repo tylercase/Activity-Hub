@@ -148,6 +148,7 @@ class WorkoutViewFrame(customtkinter.CTkFrame):
 
             title.pack(side="top", pady=5)
             listbox.pack(side="top", pady=5, padx=5)
+            listbox.configure(height=200)
             
             self.listboxes.append(listbox)
             self.workout_frames.append(frame)

@@ -4,6 +4,7 @@ import numpy as np
 import tkintermapview
 import tkinter as tk
 from typing import Callable
+from api import *
 from config import *
 from GetData import *
 from PlottingView import NewGraph
@@ -70,6 +71,7 @@ class BasicWorkoutInfoPanel(customtkinter.CTkFrame):
                      pady=10,
                      fill="both",
                      expand=True)
+        mapview.set_tile_server(f"https://api.maptiler.com/maps/outdoor-v4/256/{{z}}/{{x}}/{{y}}.png?key={MAP_API}")
         set_route(mapview, self.df)
 
         ## Summary View
