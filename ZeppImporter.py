@@ -19,6 +19,31 @@ def import_workout(path:str, workout_type:str):
     # print(f"New {workout_type} imported")
     return (df, summary)
 
+def import_workouts(path:str, workout_type:str):
+    file_paths = get_file_paths(path)
+    dfs = []
+    summaries = []
+
+    for file in file_paths:
+        df = extract_basic_data(file)
+        dfs.append(df)
+        summaries.append(get_summary(df))
+
+    return (dfs, summaries)
+        
+
+
+def get_file_paths(folder:str):
+    folder_path = Path(folder)
+    file_paths = []
+
+    for file in folder_path.iterdir():
+        if file.is_file() and file.suffix == ".gpx":
+            file_paths.append(file)
+
+    return file_paths
+
+
 def get_info(workout_type, workout_data):
     return (workout_type, workout_data[1]["run_id"].iloc[0])
 

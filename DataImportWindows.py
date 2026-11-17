@@ -1,8 +1,9 @@
 import customtkinter
 import tkinter as tk
 import tkintermapview
+from pathlib import Path
 from tkinter import ttk, filedialog
-from ZeppImporter import import_workout, get_info
+from ZeppImporter import import_workout, import_workouts, get_info
 from config import *
 from typing import Callable
 from ViewWorkout import *
@@ -97,3 +98,25 @@ class ImportZeppWindow(customtkinter.CTkToplevel):
 
     def self_destruct(self):
         self.destroy()
+
+
+class ImportAll():
+    def __init__(self, parent, path, workout_type, on_save: Callable[[], None] | None = None):      
+        dfs, summaries = import_workouts(path, workout_type)  # lst[df], lst[summary]
+        num_workouts = len(dfs)
+
+        for i in range(len(dfs)):
+            df = dfs[i]
+            summary = summaries[i]
+
+            data = (df, summary)
+            info = (workout_type, summary["run_id"].iloc[0])
+
+            import_window = ViewWorkout(parent, info, data, import_window=True, on_save=on_save)
+            import_window.wait_window(import_window)
+
+        # for i in range(len(workouts[0])):
+        #     run_id = summaries[i]["run_id"].iloc[0]
+        #     workout_info = get_info(workout_type, )
+        #     import_window = ViewWorkout(parent, )
+

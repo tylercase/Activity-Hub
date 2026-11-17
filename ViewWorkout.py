@@ -72,6 +72,7 @@ class BasicWorkoutInfoPanel(customtkinter.CTkFrame):
                      fill="both",
                      expand=True)
         mapview.set_tile_server(f"https://api.maptiler.com/maps/outdoor-v4/256/{{z}}/{{x}}/{{y}}.png?key={MAP_API}")
+        
         set_route(mapview, self.df)
 
         ## Summary View

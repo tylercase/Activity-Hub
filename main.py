@@ -66,9 +66,28 @@ class App(customtkinter.CTk):
                                                         hover_color="grey")
         self.view_workout_btn.pack(side="top", pady=20, padx=10)
 
+        self.reimport_all_btn = customtkinter.CTkButton(self.button_frame,
+                                                        text="Re-Import All",
+                                                        command=self.import_all,
+                                                        width=120,
+                                                        height=40,
+                                                        corner_radius=20,
+                                                        bg_color="black",
+                                                        fg_color="darkgrey",
+                                                        font=("Helvetica", 14, "bold"),
+                                                        text_color="black",
+                                                        hover_color="grey")
+        self.reimport_all_btn.pack(side="top", padx=10, pady=20)
+
 
         self.recent_workouts_view = WorkoutViewFrame(self)
         self.recent_workouts_view.pack(pady=10, padx=20, side="left")
+
+    def import_all(self):
+        path = filedialog.askdirectory(title="Select Activity_Hub drive folder")
+        workout_type = path.split("/")[-1].split("_")[0]
+        
+        ImportAll(self, path, workout_type, on_save=self.recent_workouts_view.update_listboxes)
 
     def view_workout(self):
         workout_to_view = self.recent_workouts_view.get_selection()
