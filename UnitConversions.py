@@ -1,6 +1,6 @@
 def convert_df(df):
     df["time"] = (df["time"] - df["time"].iloc[0]).dt.total_seconds()
-    df["elevation"] *= .280839895
+    df["elevation"] *= 3.280839895
     df["speed"] *= 2.2369362921
     df["d_distance"] *= 0.0006213712
     df["d_elevation"] *= 3.280839895
@@ -28,3 +28,6 @@ def m_to_ft(meters):
 
 def mps_to_mph(speed):
     return speed * 2.2369362921
+
+def ft_to_miles(feet):
+    return feet * 0.0001893939

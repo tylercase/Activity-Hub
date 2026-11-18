@@ -10,6 +10,7 @@ from GetData import *
 from PlottingView import NewGraph
 from UnitConversions import *
 from SetRoute import set_route
+from GradeCalculator import GradeCalculator
 
 class ViewWorkout(customtkinter.CTkToplevel):
     def __init__(self, parent, workout:tuple, data:tuple, import_window=False, *args, on_save: Callable[[], None] | None = None, **kwargs):
@@ -89,15 +90,15 @@ class BasicWorkoutInfoPanel(customtkinter.CTkFrame):
                                  fill="y")
 
         summary_values = self.summary.iloc[0].tolist()
-        summary_values[1] = s_to_time(summary_values[1])
-        summary_values[2] = round(m_to_miles(summary_values[2]), 2)
-        summary_values[5] = int(m_to_ft(summary_values[5]))
-        summary_values[6] = int(m_to_ft(summary_values[6]))
-        summary_values[7] = round(mps_to_mph(summary_values[7]), 2)
+        summary_values[1] = s_to_time(summary_values[1])                # duration
+        summary_values[2] = round(m_to_miles(summary_values[2]), 2)     # distance
+        summary_values[5] = int(m_to_ft(summary_values[5]))             # elevation_gain
+        summary_values[6] = int(m_to_ft(summary_values[6]))             # elevation_loss
+        summary_values[7] = round(mps_to_mph(summary_values[7]), 2)     # avg_speed
 
 
         value_boxes = []
-        for i in range(1, len(summary_values)):     # skip first item because it is only "run_id"
+        for i in range(1, len(SUMMARY_COLS)):     # skip first item because it is only "run_id"
             value_frame = customtkinter.CTkFrame(summary_value_frame)
             value_frame.pack(pady=5,
                              padx=5,
@@ -150,7 +151,8 @@ class BasicWorkoutInfoPanel(customtkinter.CTkFrame):
         speed_plot.pack(padx=10, pady=10)
 
         tabview.add("elevation")
-        elevation_plot = NewGraph(tabview.tab("elevation"), self.df, y_column="elevation")
+        grade_df = GradeCalculator(self.df, miles_per_section=1).get_grade_df()
+        elevation_plot = NewGraph(tabview.tab("elevation"), self.df, y_column="elevation", grade_df=grade_df)
         elevation_plot.pack(padx=10, pady=10)
 
         tabview.add("cadence")

@@ -6,7 +6,7 @@ import customtkinter
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 class NewGraph(customtkinter.CTkFrame):
-    def __init__(self, parent, data:pd.DataFrame, x_column="time", y_column="elevation", scatter=False, avg=False, *args, **kwargs):
+    def __init__(self, parent, data:pd.DataFrame, x_column="time", y_column="elevation", scatter=False, avg=False, grade_df=None, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
         # data = data.fillna(0)   # set all NaN values to 0 for plotting reasons
 
@@ -18,6 +18,12 @@ class NewGraph(customtkinter.CTkFrame):
             ax.scatter(data[x_column], data[y_column], color=PLOTTING_COLOR_DICT[y_column], s=1)
         else:
             ax.plot(data[x_column], data[y_column], color=PLOTTING_COLOR_DICT[y_column])
+
+        if grade_df is not None:
+            for i in range(grade_df.shape[0]):
+                ax.plot((grade_df["start_time"].iloc[i], grade_df["end_time"].iloc[i]), 
+                        (grade_df["start_elevation"].iloc[i], grade_df["end_elevation"].iloc[i]),
+                        color="black")
 
         if avg:
             ax.plot((data[x_column].iloc[0], data[x_column].iloc[-1]),

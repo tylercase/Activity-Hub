@@ -23,3 +23,6 @@ token.json
 
 # API Keys
 api.py
+
+# debuggin notebook
+debugger.ipynb
