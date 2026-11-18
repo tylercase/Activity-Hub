@@ -113,6 +113,7 @@ class ImportAll():
             info = (workout_type, summary["run_id"].iloc[0])
 
             import_window = ViewWorkout(parent, info, data, import_window=True, on_save=on_save)
+            import_window.after(10, import_window.lift)
             import_window.wait_window(import_window)
 
         # for i in range(len(workouts[0])):
