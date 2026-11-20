@@ -20,7 +20,9 @@ SUMMARY_COLS = (
     "elevation_loss",
     "avg_speed",
     "avg_cadence",
-    "primary_zone"
+    "primary_zone",
+    "max_grade",
+    "min_grade"
 )
 
 PLOTTING_COLOR_DICT = {
@@ -41,7 +43,9 @@ SUMMARY_UNITS = [
     "ft",
     "mph",
     "",
-    ""
+    "",
+    "%",
+    "%"
 ]
 
 MAX_HR = 205

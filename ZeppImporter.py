@@ -1,6 +1,7 @@
 from pathlib import Path
 from collections import Counter
 from config import *
+from UnitConversions import *
 from geopy.distance import geodesic
 import gpxpy
 import pandas as pd
@@ -14,6 +15,7 @@ def import_workout(path:str, workout_type:str):
 
     df = extract_basic_data(file_path)
     summary = get_summary(df)
+    df = convert_df(df)
     print(summary)
 
     # print(f"New {workout_type} imported")
@@ -26,8 +28,11 @@ def import_workouts(path:str, workout_type:str):
 
     for file in file_paths:
         df = extract_basic_data(file)
+        summary = get_summary(df)
+        df = convert_df(df)
+
         dfs.append(df)
-        summaries.append(get_summary(df))
+        summaries.append(summary)
 
     return (dfs, summaries)
         
@@ -62,7 +67,8 @@ def get_summary(df:pd.DataFrame) -> pd.DataFrame:
     ]
 
 
-    df = pd.DataFrame([lst], columns=SUMMARY_COLS)
+    df = pd.DataFrame([lst], columns=SUMMARY_COLS[:-2])     # leaving out grade calculation here,
+                                                            # that occurs in ViewWorkout.py
     return df
 
 def extract_basic_data(path:Path) -> pd.DataFrame:
@@ -100,6 +106,9 @@ def clean_df(df:pd.DataFrame) -> pd.DataFrame:
     df[["latitude", "longitude", "elevation", "speed", "hr", "cadence"]] = \
         df[["latitude", "longitude", "elevation", "speed", "hr", "cadence"]].apply(pd.to_numeric)
 
+    df[["latitude", "longitude"]] = df[["latitude", "longitude"]].rolling(5, 
+                                                                          center=True, 
+                                                                          min_periods=1).median()
     df["time"] = pd.to_datetime(df['time'], utc=True).dt.tz_convert("America/Los_Angeles")
     df["speed"] = df["speed"].interpolate(limit=5)
     df["hr"] = df["hr"].interpolate(limit=5)

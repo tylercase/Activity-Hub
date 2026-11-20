@@ -54,8 +54,12 @@ class BasicWorkoutInfoPanel(customtkinter.CTkFrame):
         self.df, self.summary = data
         self.on_save = on_save
         self.workout_type, self.run_id = workout_info
+        self.grade_df = GradeCalculator(self.df, miles_per_section=0.2).get_grade_df()
+
         if import_window:
-            self.df = convert_df(self.df)
+            ## Add grade info to Summary df
+            self.summary["max_grade"] = round(max(self.grade_df["avg_grade"]), 2)
+            self.summary["min_grade"] = round(min(self.grade_df["avg_grade"]), 2)
 
         label = customtkinter.CTkLabel(self,
                                 text=f"{self.workout_type} workout\nid = {self.run_id}",
@@ -101,9 +105,9 @@ class BasicWorkoutInfoPanel(customtkinter.CTkFrame):
         for i in range(1, len(SUMMARY_COLS)):     # skip first item because it is only "run_id"
             value_frame = customtkinter.CTkFrame(summary_value_frame)
             value_frame.pack(pady=5,
-                             padx=5,
-                             expand=True,
-                             fill="y")
+                             padx=5)
+                            #  expand=True,
+                            #  fill="y")
 
             key_label = customtkinter.CTkLabel(value_frame, 
                                                text=f"{SUMMARY_COLS[i]}",
@@ -151,8 +155,7 @@ class BasicWorkoutInfoPanel(customtkinter.CTkFrame):
         speed_plot.pack(padx=10, pady=10)
 
         tabview.add("elevation")
-        grade_df = GradeCalculator(self.df, miles_per_section=1).get_grade_df()
-        elevation_plot = NewGraph(tabview.tab("elevation"), self.df, y_column="elevation", grade_df=grade_df)
+        elevation_plot = NewGraph(tabview.tab("elevation"), self.df, y_column="elevation", grade_df=self.grade_df)
         elevation_plot.pack(padx=10, pady=10)
 
         tabview.add("cadence")
